@@ -84,7 +84,7 @@ app.post('/upload', upload.fields([
               "crop=1080:1920",
 
               // Step 3: fade-in (first 1 second
-              "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
+              // "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
               " fps=30",
             
           ])
@@ -119,7 +119,7 @@ app.post('/upload', upload.fields([
               "crop=1080:1920",
 
               // Step 3: fade-in (first 1 second
-              "fade=t=in:st=0:d=1,fade=t=out:st=6:d=1",
+              // "fade=t=in:st=0:d=1,fade=t=out:st=6:d=1",
               " fps=30",
             
           ])
@@ -152,7 +152,7 @@ app.post('/upload', upload.fields([
               "crop=1080:1920",
 
               // Step 3: fade-in (first 1 second)
-              "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
+              // "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
               " fps=30",
               // "zoompan=z='1.5-0.01*in':d=2.3"
             
@@ -263,21 +263,20 @@ app.get('/api/download/:id', async(req, res)  => {
     
     try {
       if (fs.existsSync(`outputs/final_${id}`)){
-      res.download(fileMp4)
-      setTimeout(() => {
-        fs.unlinkSync(`outputs/final_${id}`);
+        res.download(fileMp4)
         console.log('.mp4 file deleted');
-      },   6 * 60 * 1000);
+        setTimeout(() => {
+          fs.unlinkSync(`outputs/final_${id}`);
+        }, 100000000);
       }else{
         res.json({message: 'invalid file'})
         console.log('invalid file')
-    }
+    } 
     } catch (error) {
         console.error('Error:', err);
     }
   }
 })
-
 
 
 
