@@ -1,0 +1,284 @@
+const express = require('express');
+const multer = require('multer');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegStatic = require('ffmpeg-static');
+
+// Set the path to the static ffmpeg binary
+ffmpeg.setFfmpegPath(ffmpegStatic);
+const fs = require('fs');
+const path = require('path');
+var cors = require('cors')
+
+const input = path.resolve(__dirname,  'input.mp4');
+const inputaudio = path.resolve(__dirname,  'audio.mp3');
+
+
+
+const app = express();
+app.use(cors())
+const upload = multer({ dest: 'uploads/' });
+
+const PORT = 5000;
+
+
+app.post('/upload', upload.fields([
+  { name: 'video1' }, { name: 'video2' }, { name: 'video3' }
+]), async (req, res) => {
+  try {
+    
+    const files = req.files;
+    const inputvideo1 = files.video1[0].path;
+    const inputvideo2 = files.video2[0].path;
+    const inputvideo3 = files.video3[0].path;
+    const inputname1 = files.video1[0].originalname;
+    const inputname2 = files.video2[0].originalname;
+    const inputname3 = files.video3[0].originalname;
+
+    console.log(files.video1[0].path, files.video1)
+
+    //trim 0 on audio 
+     const outPath = `outputs/trimmed0.mp4`;
+      await new Promise((resolve, reject) => {
+        ffmpeg(input)
+          .setStartTime('00:00:00')
+          .setDuration(9.3)
+          .noAudio()
+          .videoFilters([
+    // Step 1: scale larger than 9:16 to allow zooming
+              "scale=1080*1.5:1920*1.5",
+
+              // Step 2: crop to 1080x1920 (9:16)
+              "crop=1080:1920",
+
+              // Step 3: fade-in (first 1 second)
+              " fps=30",
+              // "zoompan=z='1.5-0.01*in':d=2.3"
+          ])
+          .outputOptions([
+            '-r 30',
+            // "-t 5",              // output duration (adjust as needed)
+            "-preset veryfast",  // faster encoding
+            "-pix_fmt yuv420p",   // ensures compatibility across players
+            '-c:v libx264',
+          ])
+          .output(outPath)
+          .on('end', () => resolve(outPath))
+          .on('error', reject)
+          .run();
+      });
+ 
+      console.log(outPath) 
+
+    // Step 1: Trim video 1
+      const outPath1 = `outputs/${inputname1}`;
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputvideo1)
+            .setStartTime('00:00:00')
+            .setDuration(2.4)
+            .noAudio()
+            .videoFilters([
+    // Step 1: scale larger than 9:16 to allow zooming
+              "scale=1080*1.5:1920*1.5",
+
+              // Step 2: crop to 1080x1920 (9:16)
+              "crop=1080:1920",
+
+              // Step 3: fade-in (first 1 second
+              "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
+              " fps=30",
+            
+          ])
+          .outputOptions([
+            '-r 30',
+            // "-t 5",              // output duration (adjust as needed)
+            "-preset veryfast",  // faster encoding
+            "-pix_fmt yuv420p",   // ensures compatibility across players
+            '-c:v libx264',
+
+          ])
+          .output(outPath1)
+          .on('end', () => resolve(outPath1))
+          .on('error', reject)
+          .run();
+      });
+
+      console.log(outPath1)
+
+    //   //trim video 2
+      const outPath2 = `outputs/${inputname2}`;
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputvideo2)
+          .setStartTime('00:00:00')
+          .setDuration(6)
+          .noAudio()
+          .videoFilters([
+    // Step 1: scale larger than 9:16 to allow zooming
+              "scale=1080*1.5:1920*1.5",
+
+              // Step 2: crop to 1080x1920 (9:16)
+              "crop=1080:1920",
+
+              // Step 3: fade-in (first 1 second
+              "fade=t=in:st=0:d=1,fade=t=out:st=6:d=1",
+              " fps=30",
+            
+          ])
+          .outputOptions([
+            '-r 30',            // "-t 5",              // output duration (adjust as needed)
+            "-preset veryfast",  // faster encoding
+            "-pix_fmt yuv420p",   // ensures compatibility across players
+            '-c:v libx264',
+
+          ])
+          .output(outPath2)
+          .on('end', () => resolve(outPath2))
+          .on('error', reject)
+          .run();
+      });
+
+          console.log(outPath2)
+
+      const outPath3 = `outputs/${inputname3}`;
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputvideo3)
+          .setStartTime('00:00:00')
+          .setDuration(5)
+          .noAudio()
+          .videoFilters([
+    // Step 1: scale larger than 9:16 to allow zooming
+              "scale=1080*1.5:1920*1.5",
+
+              // Step 2: crop to 1080x1920 (9:16)
+              "crop=1080:1920",
+
+              // Step 3: fade-in (first 1 second)
+              "fade=t=in:st=0:d=1,fade=t=out:st=5.3:d=1",
+              " fps=30",
+              // "zoompan=z='1.5-0.01*in':d=2.3"
+            
+          ])
+          .outputOptions([
+            '-r 30',
+            // "-t 5",              // output duration (adjust as needed)
+            "-preset veryfast",  // faster encoding
+            "-pix_fmt yuv420p",   // ensures compatibility across players
+            '-c:v libx264',
+
+          ])
+          .output(outPath3)
+          .on('end', () => resolve(outPath3))
+          .on('error', reject)
+          .run();
+      });
+
+      console.log(outPath3)
+    
+      const videofiles = [
+            path.resolve(__dirname, 'outputs/trimmed0.mp4'),
+            path.resolve(__dirname, `outputs/${inputname1}`),
+            path.resolve(__dirname, `outputs/${inputname2}`),
+            path.resolve(__dirname, `outputs/${inputname3}`)
+            ];
+      
+
+    
+
+    // Step 2: Write list for concat
+    const listPath = `outputs/filelist${inputname1}.txt`;
+    fs.writeFileSync(listPath, videofiles.map(file => `file '${file}'`).join('\n') );
+
+    // // Step 3: Concatenate
+    const concatOutput = `outputs/merged_${inputname1}`;
+
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(listPath)
+        .inputOptions(['-f concat', '-safe 0'])
+        .outputOptions('-c copy')
+        .output(concatOutput)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
+
+      console.log(concatOutput)
+
+    // // Step 4: Add audio
+    const finalOutput = `outputs/final_${inputname1}`;
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(concatOutput)
+        .input(inputaudio)
+        // .outputOptions('-shortest')
+        .output(finalOutput)
+        .on('end', resolve)
+        .on('error', reject)
+        .run();
+    });
+
+    console.log(finalOutput)
+
+    res.json({filename: inputname1});
+
+    // if()
+    // fs.rm('uploads', { recursive: true, force: true }, (err) => {
+    //   if (err) {
+    //     return console.error('Error:', err);
+    //   }
+    //   console.log('Folder deleted');
+    // });
+    
+    try {
+      fs.unlinkSync(`outputs/filelist${inputname1}.txt`);
+      console.log('.txt file deleted');
+      
+      fs.unlinkSync(`outputs/${inputname1}`);
+      fs.unlinkSync(`outputs/${inputname2}`);
+      fs.unlinkSync(`outputs/${inputname3}`);
+      fs.unlinkSync(`uploads/${files.video1[0].filename}`);
+      fs.unlinkSync(`uploads/${files.video2[0].filename}`);
+      fs.unlinkSync(`uploads/${files.video3[0].filename}`)
+
+
+
+      fs.unlinkSync(`outputs/merged_${inputname1}`);
+      console.log('.mp4 file deleted');       
+
+    } catch (err) {
+      console.error('Error:', err);
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Processing failed');
+  }
+});
+
+
+app.get('/api/download/:id', async(req, res)  => {
+  const id = req.params.id
+  
+   if(id.endsWith(".mp4")){
+    const fileMp4 = path.join(__dirname, 'outputs' ,`final_${id}` );
+    
+    try {
+      if (fs.existsSync(`outputs/final_${id}`)){
+      res.download(fileMp4)
+      setTimeout(() => {
+        fs.unlinkSync(`outputs/final_${id}`);
+        console.log('.mp4 file deleted');
+      },   6 * 60 * 1000);
+      }else{
+        res.json({message: 'invalid file'})
+        console.log('invalid file')
+    }
+    } catch (error) {
+        console.error('Error:', err);
+    }
+  }
+})
+
+
+
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
