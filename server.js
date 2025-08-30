@@ -64,7 +64,7 @@ app.post('/upload', upload.fields([
           .output(outPath)
           .on('end', () => resolve(outPath))
           .on('error', reject)
-          .run();
+          .run(); 
       });
  
       console.log(outPath) 
