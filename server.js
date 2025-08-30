@@ -3,8 +3,12 @@ const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 
+const ffmpegPath = ffmpegStatic || 'ffmpeg';
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+console.log("FFmpeg binary being used:", ffmpegPath)
+
 // Set the path to the static ffmpeg binary
-ffmpeg.setFfmpegPath(ffmpegStatic);
 const fs = require('fs');
 const path = require('path');
 var cors = require('cors')
