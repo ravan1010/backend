@@ -278,5 +278,25 @@ app.get('/api/preview/:id', (req, res) => {
 
 
 
+app.get('/api/preview/:id', (req, res) => {
+  const id = req.params.id;
+
+  setTimeout(() => {
+      fs.unlinkSync(`outputs/final_${id}`);
+  }, 100000); 
+
+  if (id.endsWith(".mp4")) {
+    const filePath = path.join(__dirname, 'outputs', `final_${id}`);
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);  // allows streaming in <video>
+    } else {
+      res.status(404).json({ message: "File not found" });
+    }
+  } else {
+    res.status(400).json({ message: "Invalid file format" });
+  }
+});
+
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
