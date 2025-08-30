@@ -2,6 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
+const fs = require('fs');
+const path = require('path');
+const cors = require('cors')
 
 if (ffmpegStatic) {
   ffmpeg.setFfmpegPath(ffmpegStatic);
@@ -13,29 +16,21 @@ if (ffmpegStatic) {
 }
 
 // Set the path to the static ffmpeg binary
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors')
-if (!fs.existsSync('outputs')) {
-  fs.mkdirSync('outputs');
-}
+
+
+if (!fs.existsSync('outputs')) fs.mkdirSync('outputs');
+if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
 const input = path.resolve(__dirname,  'input.mp4');
 const inputaudio = path.resolve(__dirname,  'audio.mp3');
 
-
-
-
 const app = express();
-
-app.use(express.urlencoded({extended:true, limit: '200mb'}))
-app.use(express.json({ limit: '200mb' }))
-
 
 app.use(cors({
   origin: true, // reflects request origin automatically
   credentials: true
 }));
+
 const upload = multer({ dest: 'uploads/' });
 
 const PORT = 5000;
