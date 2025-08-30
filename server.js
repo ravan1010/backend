@@ -15,7 +15,16 @@ const inputaudio = path.resolve(__dirname,  'audio.mp3');
 
 
 const app = express();
-app.use(cors())
+
+app.use(express.urlencoded({extended:true, limit: '200mb'}))
+app.use(express.json({ limit: '200mb' }))
+app.use(cookieParser())
+
+
+app.use(cors({
+  origin: true, // reflects request origin automatically
+  credentials: true
+}));
 const upload = multer({ dest: 'uploads/' });
 
 const PORT = 5000;
