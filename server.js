@@ -255,28 +255,25 @@ app.post('/upload', upload.fields([
 });
 
 
-app.get('/api/download/:id', async(req, res)  => {
-  const id = req.params.id
-  
-   if(id.endsWith(".mp4")){
-    const fileMp4 = path.join(__dirname, 'outputs' ,`final_${id}` );
-    
-    try {
-      if (fs.existsSync(`outputs/final_${id}`)){
-        res.download(fileMp4)
-        console.log('.mp4 file deleted');
-        setTimeout(() => {
-          fs.unlinkSync(`outputs/final_${id}`);
-        }, 100000000);
-      }else{
-        res.json({message: 'invalid file'})
-        console.log('invalid file')
-    } 
-    } catch (error) {
-        console.error('Error:', err);
+app.get('/api/preview/:id', (req, res) => {
+  const id = req.params.id;
+
+  setTimeout(() => {
+      fs.unlinkSync(`outputs/final_${id}`);
+  }, 100000);
+
+  if (id.endsWith(".mp4")) {
+    const filePath = path.join(__dirname, 'outputs', `final_${id}`);
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);  // allows streaming in <video>
+    } else {
+      res.status(404).json({ message: "File not found" });
     }
+  } else {
+    res.status(400).json({ message: "Invalid file format" });
   }
-})
+});
+
 
 
 
