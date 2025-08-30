@@ -3,18 +3,22 @@ const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
 
-const ffmpegPath = ffmpegStatic || 'ffmpeg';
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-ffmpeg.setFfmpegPath('/usr/bin/ffmpeg');
-
-
-console.log("FFmpeg binary being used:", ffmpegPath)
+if (ffmpegStatic) {
+  ffmpeg.setFfmpegPath(ffmpegStatic);
+  console.log("Using ffmpeg-static:", ffmpegStatic);
+} else {
+  // fallback to system ffmpeg (if available)
+  ffmpeg.setFfmpegPath('/usr/bin/ffmpeg');
+  console.log("Using system ffmpeg: /usr/bin/ffmpeg");
+}
 
 // Set the path to the static ffmpeg binary
 const fs = require('fs');
 const path = require('path');
-var cors = require('cors')
+const cors = require('cors')
+if (!fs.existsSync('outputs')) {
+  fs.mkdirSync('outputs');
+}
 
 const input = path.resolve(__dirname,  'input.mp4');
 const inputaudio = path.resolve(__dirname,  'audio.mp3');
