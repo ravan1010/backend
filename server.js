@@ -6,6 +6,9 @@ const ffmpegStatic = require('ffmpeg-static');
 const ffmpegPath = ffmpegStatic || 'ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 
+ffmpeg.setFfmpegPath('/usr/bin/ffmpeg');
+
+
 console.log("FFmpeg binary being used:", ffmpegPath)
 
 // Set the path to the static ffmpeg binary
@@ -15,6 +18,7 @@ var cors = require('cors')
 
 const input = path.resolve(__dirname,  'input.mp4');
 const inputaudio = path.resolve(__dirname,  'audio.mp3');
+
 
 
 
