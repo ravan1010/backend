@@ -260,7 +260,7 @@ app.get('/api/preview/:id', (req, res) => {
 
   setTimeout(() => {
       fs.unlinkSync(`outputs/final_${id}`);
-  }, 100000);
+  }, 100000); 
 
   if (id.endsWith(".mp4")) {
     const filePath = path.join(__dirname, 'outputs', `final_${id}`);
